@@ -17,3 +17,7 @@ function loadNarrative() {
         location.href = "visual-narrative.html";
     });
 }
+
+$(document).ready(function() {
+    $("#container").fadeIn(2000);
+});

@@ -335,11 +335,12 @@ Bird.prototype.draw = function() {
   ctx.restore();
 };
 
-// document.getElementById("g").addEventListener("click", function() {
-// 	document.getElementById("picture").setAttribute("src", images[++imageNum].src.toString());
-// })
-
 $("#g").click(function() {
+	if (!forward && imageNum === 0) {
+		$("#wrapper").fadeOut(1000, function() {
+			location.href = "index.html";
+		});
+	}
 	
 	sounds[imageNum].fade(1.0, 0.0, 2000);
 	$("*").css("cursor", "url('images/bird-flying-icon.png'), default");
