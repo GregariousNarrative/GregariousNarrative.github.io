@@ -8,8 +8,8 @@ canvas {
    height: 100vh;
    left: 0px;
    top: 0px;
+   position: absolute;
    z-index:10;
-   position: fixed;
 }
 
 html {
@@ -17,7 +17,6 @@ html {
 }
 
 img {
-    position: fixed;
     z-index: 0;
     left: 0px;
     top: 0px;
