@@ -119,28 +119,35 @@ addEventListener('resize', function(){
 });
 
 addEventListener('mousedown', function(event){
-  boids.push( new Boid( {
-    id: boids.length,
-    x: event.clientX,
-    y: event.clientY,
-    speedIndex: speedIndex,
-    radius: radius,
-  }));
+	if (!$("#g").parent().children().is(':animated')) {
+		boids.push( new Boid( {
+			id: boids.length,
+			x: event.clientX,
+			y: event.clientY,
+			speedIndex: speedIndex,
+			radius: radius,
+		}));
+	}
+	return false;
 });
 
+// Create images
 var count = 10;
 var image = new Image();
 var image2 = new Image();
-var image3 = new Image();
-var image4 = new Image();
-var image5 = new Image();
-var image6 = new Image();
-var image7 = new Image();
-var image8 = new Image();
-var image9 = new Image();
+var	image3 = new Image();
+var	image4 = new Image();
+var	image5 = new Image();
+var	image6 = new Image();
+var	image7 = new Image();
+var	image8 = new Image();
+var	image9 = new Image();
 var image10 = new Image();
 
-image.onload = image2.onload = image3.onload = image4.onload = image5.onload = image6.onload = image7.onload = image8.onload = image9.onload = image10.onload = handleLoad;
+ // Display first image on load
+image.onload = handleLoad;
+
+// Store images and define sources
 var images = [image, image2, image3, image4, image5, image6, image7, image8, image9, image10];
 images[0].src = 'https://i.pinimg.com/originals/a2/c7/b2/a2c7b2bdf9c2c33b42e45e5bf7a8bbcd.jpg';
 images[1].src = 'https://upload.wikimedia.org/wikipedia/commons/3/34/Monument_de_la_r%C3%A9unification_Yaound%C3%A9_03.JPG';
@@ -153,6 +160,7 @@ images[7].src = 'https://api.services.trvl.com/backgrounds/images/italy_1.jpg';
 images[8].src = 'https://i.ytimg.com/vi/pCc1OQLxgpc/maxresdefault.jpg';
 images[9].src = 'http://www.inventiveleads.com/wp-content/uploads/2017/07/69303659-sweden-wallpapers.jpg';
 
+// Define sounds
 var sounds = {
 	0: new Howl({
 		src: ['sounds/congo.mp3'],
@@ -206,6 +214,7 @@ var sounds = {
 	})
 };
 
+// Draw the first image
 function handleLoad() {
     count--;
     if (count === 0) {
@@ -213,36 +222,59 @@ function handleLoad() {
     }
 };
 
-var forward = true,
-    imageNum = 0;
-    isBusy = false;
-
+// Globals
+var forward = true;
+var imageNum = 0;
 var img = images[0];
-var opacity = 1;
 
+/**
+ * Change background image and song - Go to new "destination"
+ */
 $("#g").click(function() {
+	// Disallow clicks during transition
+	if (!$(this).parent().children().is(':animated')) {
 
-	sounds[imageNum].fade(1.0, 0.0, 2000);
-	$("*").css("cursor", "url('images/bird-flying-icon.png'), default");
+		// If on return trip, go back to index page
+		if (!forward && imageNum === 0) {
+			$("#wrapper").fadeOut(1000, function () {
+				location.href = "index.html";
+			});
+		}
 
-	$("#picture").fadeOut(1500, function() {
-		img = forward ? images[++imageNum] : images[--imageNum];
-		$("#picture").attr("src", img.src.toString());
-		$("#picture").fadeIn(1500, function() {
-			$("*").css("cursor", "pointer");
+		// Fade current song and change cursor to blend into boids
+		sounds[imageNum].fade(1.0, 0.0, 2000);
+		$("*").css("cursor", "url('images/bird-flying-icon.png'), default");
+
+		// Fade current image/song into next image/song
+		$("#picture").fadeOut(1500, function() {
+			
+			img = forward ? images[++imageNum] : images[--imageNum];
+			$("#picture").attr("src", img.src.toString());
+
+			$("#picture").fadeIn(1500, function() {
+				$("*").css("cursor", "pointer");
+			});
+
+			sounds[imageNum].play();
+			sounds[imageNum].fade(0.0, 1.0, 2000);
+
+			// Stop last song
+			setTimeout(function() {
+				if (forward) { sounds[imageNum - 1].stop(); }
+				else { sounds[imageNum + 1].stop(); }
+			}, 500);
 		});
-		sounds[imageNum].play();
-		sounds[imageNum].fade(0.0, 1.0, 2000);
-		setTimeout(function() {
-			if (forward) { sounds[imageNum - 1].stop(); }
-			else { sounds[imageNum + 1].stop(); }
-		}, 500);
-	});
 
-	if (imageNum === 9) forward = false;
-	if (imageNum === 0) forward = true;
+		// Trip direction
+		if (imageNum === 9) forward = false;
+		if (imageNum === 0) forward = true;
+	}
+	return false; // Do nothing if transition is still going
 });
 
+/**
+ * Handle page load
+ */
 $(document).ready(function() {
 	$("#wrapper").fadeIn(2000, function() {
 		sounds[0].play();
